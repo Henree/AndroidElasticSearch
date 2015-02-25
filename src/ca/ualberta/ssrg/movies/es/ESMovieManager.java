@@ -9,6 +9,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.apache.http.HttpResponse;
+import org.apache.http.client.ClientProtocolException;
 import org.apache.http.client.HttpClient;
 import org.apache.http.client.methods.HttpDelete;
 import org.apache.http.client.methods.HttpGet;
@@ -42,8 +43,8 @@ public class ESMovieManager implements IMovieManager {
 	 */
 	public Movie getMovie(int id) {
 
-		HttpClient httpClient = new DefaultHttpClient();
-		HttpGet httpGet = new HttpGet(RESOURCE_URL + id);
+		HttpClient httpClient = new DefaultHttpClient(); //Acts like curl
+		HttpGet httpGet = new HttpGet(RESOURCE_URL + id); 
 
 		HttpResponse response;
 
@@ -67,7 +68,34 @@ public class ESMovieManager implements IMovieManager {
 	 */
 	public List<Movie> searchMovies(String searchString, String field) {
 		List<Movie> result = new ArrayList<Movie>();
-
+		
+		
+		HttpClient httpClient = new DefaultHttpClient();
+		HttpPost httpPost;
+		try
+		{
+			httpPost = createSearchRequest(searchString, field);
+		
+			HttpResponse response;
+		
+			response = httpClient.execute(httpPost);
+			SearchResponse<Movie> sr = parseSearchResponse(response);
+			Hits<Movie> hits  = sr.getHits();
+			//Should create a loop to get multiple movies, not just one
+			result.add(hits.getHits().get(1).getSource());
+		}
+		catch(UnsupportedEncodingException e)
+		{
+			throw new RuntimeException(e);
+		}
+		catch(ClientProtocolException e)
+		{
+			throw new RuntimeException(e);
+		}
+		catch(IOException e)
+		{
+			throw new RuntimeException(e);
+		}
 		// TODO: Implement search movies using ElasticSearch
 		
 		return result;
@@ -144,7 +172,7 @@ public class ESMovieManager implements IMovieManager {
 	private SearchHit<Movie> parseMovieHit(HttpResponse response) {
 		
 		try {
-			String json = getEntityContent(response);
+			String json = getEntityContent(response); //gets whatever the server sends back
 			Type searchHitType = new TypeToken<SearchHit<Movie>>() {}.getType();
 			
 			SearchHit<Movie> sr = gson.fromJson(json, searchHitType);

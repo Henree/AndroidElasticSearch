@@ -84,7 +84,13 @@ public class MainActivity extends Activity {
 	@Override
 	protected void onResume() {
 		super.onResume();
-
+		
+		Thread thread = new SearchThread("dark"); //Creates a thread thats not the UI thread to prevent freezing.
+		/*{
+			@Override
+			public void
+		};*/ // Use this to create a invisible class if needed
+		
 		// Refresh the list when visible
 		// TODO: Search all
 		
@@ -126,6 +132,19 @@ public class MainActivity extends Activity {
 
 	class SearchThread extends Thread {
 		// TODO: Implement search thread
+		private String search;
+		
+		public SearchThread(String search) 
+		{
+			this.search = search;
+		}
+		
+		public void run()
+		{
+			movies.addAll(movieManager.searchMovies("", null));
+			
+			runOnUiThread(doUpdateGUIList);
+		}
 		
 	}
 

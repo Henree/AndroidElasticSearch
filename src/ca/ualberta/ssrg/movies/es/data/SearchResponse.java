@@ -2,7 +2,7 @@ package ca.ualberta.ssrg.movies.es.data;
 
 
 public class SearchResponse<T> {
-
+//Takes the information from the site and inputting it in the class
 	private int took;
 	private boolean timed_out;
 	private Shard _shards;
