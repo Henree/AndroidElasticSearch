@@ -80,7 +80,7 @@ public class ESMovieManager implements IMovieManager {
 		
 			response = httpClient.execute(httpPost);
 			SearchResponse<Movie> sr = parseSearchResponse(response);
-			Hits<Movie> hits  = sr.getHits();
+			Hits<Movie> hits = sr.getHits();
 			//Should create a loop to get multiple movies, not just one
 			result.add(hits.getHits().get(1).getSource());
 		}
